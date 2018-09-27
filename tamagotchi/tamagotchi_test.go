@@ -3,13 +3,15 @@ package tamagotchi
 import (
 	"github.com/joanlopez/golang-tamagotchi-kata/food"
 	"testing"
+	"github.com/joanlopez/golang-tamagotchi-kata/carers"
+	"reflect"
 )
 
 type eatTC struct {
-	name string
-	tamagotchi Tamagotchi
-	eatable food.Eatable
-	expectedLife int
+	name           string
+	tamagotchi     *Tamagotchi
+	eatable        food.Eatable
+	expectedLife   int
 	expectedStatus Status
 }
 
@@ -22,7 +24,7 @@ var eatTCs = []eatTC{
 	{"bit tired eat ham", tamagotchiWith(90), food.NewChocolate(), 25, SICK},
 }
 
-func TestEat(t *testing.T) {
+func TestTamagotchi_Eat(t *testing.T) {
 	for _, tc := range eatTCs {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.tamagotchi.Eat(tc.eatable)
@@ -36,10 +38,37 @@ func TestEat(t *testing.T) {
 	}
 }
 
-func tiredTamagotchi() Tamagotchi {
-	return Tamagotchi{40, ALIVE}
+func TestTamagotchi_Care(t *testing.T) {
+	expectedNotifications := []string {
+		"Status changed from: Alive; to: Sick",
+	}
+	human := &FakeHuman{}
+	tamagotchi := tamagotchiWith(MAX_LIFE)
+	human.TakeCare(tamagotchi)
+	tamagotchi.Eat(food.NewLettuce())
+	if !reflect.DeepEqual(human.receivedNotifications, expectedNotifications) {
+		t.Errorf("The tamagotchi's carer was not notified properly")
+	}
 }
 
-func tamagotchiWith(lifePoints int) Tamagotchi {
-	return Tamagotchi{lifePoints, ALIVE}
+// Private types and functions
+
+type FakeHuman struct {
+	receivedNotifications []string
+}
+
+func (h *FakeHuman) Notify(message string) {
+	h.receivedNotifications = append(h.receivedNotifications, message)
+}
+
+func (h *FakeHuman) TakeCare(pet carers.Pet) {
+	pet.Care(h)
+}
+
+func tiredTamagotchi() *Tamagotchi {
+	return &Tamagotchi{40, ALIVE, []carers.Carer{}}
+}
+
+func tamagotchiWith(lifePoints int) *Tamagotchi {
+	return &Tamagotchi{lifePoints, ALIVE, []carers.Carer{}}
 }

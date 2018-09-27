@@ -1,11 +1,11 @@
 package tamagotchi
 
-type Status int
+type Status string
 
 const (
-	DEAD Status = iota
-	SICK
-	ALIVE
+	DEAD Status = "Dead"
+	SICK Status = "Sick"
+	ALIVE Status = "Alive"
 )
 
 func newStatus(lifePoints int) Status {
