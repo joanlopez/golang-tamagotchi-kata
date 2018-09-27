@@ -3,4 +3,4 @@
 Tamagotchi Kata written in Golang
 
 ##### Usage
-> make tests # to run tests
+> make tests
